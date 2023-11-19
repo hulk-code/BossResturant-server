@@ -27,6 +27,7 @@ async function run() {
     const manuCollection = client.db("bossResturant").collection("manudata");
     const reviewsCollection = client.db("bossResturant").collection("reviewsdata");
     const cartCollection = client.db("bossResturant").collection("carts");
+    const userCollection = client.db("bossResturant").collection("user");
     
      app.get('/menu' ,async(req ,res)=>{
         const result=await manuCollection.find().toArray()
@@ -56,6 +57,29 @@ async function run() {
     const id=req.params.id;
     const query={_id :new ObjectId(id)}
     const result=await cartCollection.deleteOne(query);
+    res.send(result)
+   })
+
+   //user Collection 
+   app.post('/user' , async(req , res) =>{
+    const users=req.body;
+    const query={email :users.email}
+    const existingUser=await userCollection.findOne(query)
+    if(existingUser){
+      return res.send({message :'user already exists' ,insertedId:null})
+    }
+    const result=await userCollection.insertOne(users);
+    res.send(result)
+   })
+   app.get('/user' , async(req , res) =>{
+     const result=await userCollection.find().toArray()
+     res.send(result)
+   })
+
+   app.delete('/user/:id',async (req ,res)  =>{
+    const id=req.params.id;
+    const query={_id : new ObjectId(id)}
+    const result=await userCollection.deleteOne(query)
     res.send(result)
    })
 
